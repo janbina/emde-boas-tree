@@ -10,8 +10,8 @@ class VebTree<E>(private val k: Int) : Veb<E> {
     private var max: Pair<Int, E>? = null
 
     init {
-        val subtreeCount = k
         val subtreeSize = k / 2
+        val subtreeCount = 1 shl subtreeSize
         if (subtreeSize == 1) {
             clusters = Array(subtreeCount, { VebNode<E>() })
             summary = VebNode()
