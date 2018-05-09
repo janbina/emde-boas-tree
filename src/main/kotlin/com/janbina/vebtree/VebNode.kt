@@ -2,9 +2,8 @@ package com.janbina.vebtree
 
 class VebNode<E> : Veb<E> {
 
-    private var min: Pair<Int, E>? = null
-
-    private var max: Pair<Int, E>? = null
+    private var min: VebTree.Node<E>? = null
+    private var max: VebTree.Node<E>? = null
 
     override fun insert(key: Int, value: E) {
         if (!isKeyInRange(key)) {
@@ -13,7 +12,7 @@ class VebNode<E> : Veb<E> {
 
         val lMin = min
         val lMax = max
-        val x = key to value
+        val x = VebTree.Node(key, value)
 
         if (lMin == null) {
             min = x
@@ -42,7 +41,7 @@ class VebNode<E> : Veb<E> {
 
     override fun max() = max
 
-    override fun successor(key: Int): Pair<Int, E>? {
+    override fun successor(key: Int): VebTree.Node<E>? {
         // this can succeed only if we are looking for successor of 0 and our max is nonnull with key 1
         val lMax = max
         if (key == 0 && lMax != null && lMax.key == 1) {
@@ -51,7 +50,7 @@ class VebNode<E> : Veb<E> {
         return null
     }
 
-    override fun predecessor(key: Int): Pair<Int, E>? {
+    override fun predecessor(key: Int): VebTree.Node<E>? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

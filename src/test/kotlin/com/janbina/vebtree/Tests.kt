@@ -110,11 +110,11 @@ class Tests {
         }
     }
 
-    private fun <E> testNonNullAndValue(actual: Pair<Int, E>?, expectedKey: Int, expectedValue: E) {
+    private fun <E> testNonNullAndValue(actual: VebTree.Node<E>?, expectedKey: Int, expectedValue: E) {
         assertNotNull(actual)
         actual!!
-        assertEquals(expectedKey, actual.first)
-        assertEquals(expectedValue, actual.second)
+        assertEquals(expectedKey, actual.key)
+        assertEquals(expectedValue, actual.value)
     }
 
     private fun testException(expectedClass: KClass<out Exception> = Exception::class, action: () -> Unit) {

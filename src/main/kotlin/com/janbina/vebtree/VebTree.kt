@@ -6,8 +6,8 @@ class VebTree<E>(private val k: Int) : Veb<E> {
     private val clusters: Array<Veb<E>>
     private val summary: Veb<Boolean>
 
-    private var min: Pair<Int, E>? = null
-    private var max: Pair<Int, E>? = null
+    private var min: Node<E>? = null
+    private var max: Node<E>? = null
 
     init {
         val subtreeSize = k / 2
@@ -28,7 +28,7 @@ class VebTree<E>(private val k: Int) : Veb<E> {
 
         val lMin = min
         val lMax = max
-        val x = key to value
+        val x = Node(key, value)
 
         if (lMin == null) {
             min = x
@@ -69,7 +69,7 @@ class VebTree<E>(private val k: Int) : Veb<E> {
 
     override fun max() = max
 
-    override fun successor(key: Int): Pair<Int, E>? {
+    override fun successor(key: Int): Node<E>? {
         val lMin = min
 
         if (lMin == null || key < lMin.key) {
@@ -78,13 +78,13 @@ class VebTree<E>(private val k: Int) : Veb<E> {
 
         var clusterMax = clusters[high(key)].max()
         if (clusterMax != null) {
-            clusterMax = index(high(key), clusterMax.first) to clusterMax.second
+            clusterMax = Node(index(high(key), clusterMax.key), clusterMax.value)
         }
 
         if (clusterMax != null && key < clusterMax.key) {
             val ret = clusters[high(key)].successor(low(key))
             if (ret != null) {
-                return index(high(key), ret.first) to ret.second
+                return Node(index(high(key), ret.key), ret.value)
             } else {
                 return null
             }
@@ -94,13 +94,13 @@ class VebTree<E>(private val k: Int) : Veb<E> {
 
         val ret = clusters[targetCluster].min()
         if (ret != null) {
-            return index(targetCluster, ret.first) to ret.second
+            return Node(index(targetCluster, ret.key), ret.value)
         } else {
             return null
         }
     }
 
-    override fun predecessor(key: Int): Pair<Int, E>? {
+    override fun predecessor(key: Int): Node<E>? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -112,9 +112,8 @@ class VebTree<E>(private val k: Int) : Veb<E> {
 
     private fun isKeyInRange(key: Int) = key in (0 until u)
 
-    private val <A, B> Pair<A, B>.key: A
-        get() = first
-
-    private val <A, B> Pair<A, B>.value: B
-        get() = second
+    data class Node<E>(
+            val key: Int,
+            val value: E
+    )
 }
