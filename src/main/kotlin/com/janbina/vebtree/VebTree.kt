@@ -76,28 +76,18 @@ class VebTree<E>(private val k: Int) : Veb<E> {
             return min
         }
 
-        var clusterMax = clusters[high(key)].max()
-        if (clusterMax != null) {
-            clusterMax = Node(index(high(key), clusterMax.key), clusterMax.value)
-        }
+        var targetCluster = high(key)
+
+        val clusterMax = clusters[targetCluster].max()?.recomputeKey(targetCluster)
 
         if (clusterMax != null && key < clusterMax.key) {
-            val ret = clusters[high(key)].successor(low(key))
-            if (ret != null) {
-                return Node(index(high(key), ret.key), ret.value)
-            } else {
-                return null
-            }
+            targetCluster = high(key)
+            return clusters[targetCluster].successor(low(key))?.recomputeKey(targetCluster)
         }
 
-        val targetCluster = summary.successor(high(key))?.key ?: return null
+        targetCluster = summary.successor(high(key))?.key ?: return null
 
-        val ret = clusters[targetCluster].min()
-        if (ret != null) {
-            return Node(index(targetCluster, ret.key), ret.value)
-        } else {
-            return null
-        }
+        return clusters[targetCluster].min()?.recomputeKey(targetCluster)
     }
 
     override fun predecessor(key: Int): Node<E>? {
@@ -116,4 +106,8 @@ class VebTree<E>(private val k: Int) : Veb<E> {
             val key: Int,
             val value: E
     )
+
+    private fun <E> Node<E>.recomputeKey(high: Int): Node<E> {
+        return Node(index(high, key), value)
+    }
 }
