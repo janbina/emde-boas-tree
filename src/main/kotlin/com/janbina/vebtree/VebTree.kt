@@ -76,15 +76,28 @@ class VebTree<E>(private val k: Int) : Veb<E> {
             return min
         }
 
-        val clusterMax = clusters[high(key)].max()
+        var clusterMax = clusters[high(key)].max()
+        if (clusterMax != null) {
+            clusterMax = index(high(key), clusterMax.first) to clusterMax.second
+        }
 
         if (clusterMax != null && key < clusterMax.key) {
-            return clusters[high(key)].successor(low(key))
+            val ret = clusters[high(key)].successor(low(key))
+            if (ret != null) {
+                return index(high(key), ret.first) to ret.second
+            } else {
+                return null
+            }
         }
 
         val targetCluster = summary.successor(high(key))?.key ?: return null
 
-        return clusters[targetCluster].min()
+        val ret = clusters[targetCluster].min()
+        if (ret != null) {
+            return index(targetCluster, ret.first) to ret.second
+        } else {
+            return null
+        }
     }
 
     override fun predecessor(key: Int): Pair<Int, E>? {
