@@ -1,5 +1,9 @@
 package com.janbina.vebtree
 
+/**
+ * VebTree is implementation of Van Emde Boas tree structure.
+ * Provide number of elements you want to store in constructor.
+ */
 class VebTree<E>(size: Int) : Veb<E> {
 
     private val k: Int
@@ -44,6 +48,11 @@ class VebTree<E>(size: Int) : Veb<E> {
         }
     }
 
+    /**
+     * Inserts provided key - value pair to this tree.
+     * If there was another item with the same key, it will be replaced.
+     * @throws IndexOutOfBoundsException if provided key is out of range
+     */
     override fun insert(key: Int, value: E) {
         if (!isKeyInRange(key)) {
             throw IndexOutOfBoundsException()
@@ -100,6 +109,9 @@ class VebTree<E>(size: Int) : Veb<E> {
         summary!!.insert(key, true)
     }
 
+    /**
+     * Deletes provided key and its value from this tree
+     */
     override fun delete(key: Int) {
         if (!isKeyInRange(key)) return
 
@@ -146,10 +158,19 @@ class VebTree<E>(size: Int) : Veb<E> {
         }
     }
 
+    /**
+     * @return Minimal key stored in this tree and its value, null if tree is empty
+     */
     override fun min() = min
 
+    /**
+     * @return Maximal key stored in this tree and its value, null if tree is empty
+     */
     override fun max() = max
 
+    /**
+     * @return Minimal key bigger than provided key and its value, null if there is no bigger key in this tree
+     */
     override fun successor(key: Int): Node<E>? {
         val lMin = min
 
@@ -170,6 +191,9 @@ class VebTree<E>(size: Int) : Veb<E> {
         return clusters[targetCluster]?.min()?.recomputeKey(targetCluster)
     }
 
+    /**
+     * @return Maximal key smaller than provided key and its value, null if there is no smaller key in this tree
+     */
     override fun predecessor(key: Int): Node<E>? {
         val lMin = min
 
@@ -197,6 +221,9 @@ class VebTree<E>(size: Int) : Veb<E> {
         return clusters[targetCluster]?.max()?.recomputeKey(targetCluster)
     }
 
+    /**
+     * @return capacity of this tree (number of items you can store here)
+     */
     fun getCapacity() = u
 
     private fun index(high: Int, low: Int) = (high shl (k / 2)) + low

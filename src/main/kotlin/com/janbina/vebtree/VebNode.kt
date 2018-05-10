@@ -1,5 +1,9 @@
 package com.janbina.vebtree
 
+/**
+ * VebNode is VebTree without any subtrees.
+ * There are not any clusters nor summary, just min and max.
+ */
 class VebNode<E> : Veb<E> {
 
     private var min: VebTree.Node<E>? = null
