@@ -197,9 +197,7 @@ class VebTree<E>(size: Int) : Veb<E> {
         return clusters[targetCluster]?.max()?.recomputeKey(targetCluster)
     }
 
-    fun getSize() = u
-
-    fun getMaxKey() = u - 1
+    fun getCapacity() = u
 
     private fun index(high: Int, low: Int) = (high shl (k / 2)) + low
 
