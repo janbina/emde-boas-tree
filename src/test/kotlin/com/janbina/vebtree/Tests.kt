@@ -17,6 +17,8 @@ class Tests {
 
         // finding successors returns null
         assertNull(tree.successor(10))
+        // finding predecessor returns null
+        assertNull(tree.predecessor(10))
     }
 
     @Test
@@ -83,6 +85,20 @@ class Tests {
     }
 
     @Test
+    fun testPredecessor() {
+        val tree = VebTree<Int>(8)
+
+        tree.insert(20, 1000)
+
+        // test that predecessor finds inserted value
+        testNonNullAndValue(tree.predecessor(21), 20, 1000)
+
+        // test that predecessor returns null for key <= max.key
+        assertNull(tree.predecessor(20))
+        assertNull(tree.predecessor(10))
+    }
+
+    @Test
     fun testFullTree() {
         val treeSize = 8
         val tree = VebTree<Int>(treeSize)
@@ -94,14 +110,30 @@ class Tests {
             tree.insert(i, i * i)
         }
 
+        // Test start -> end traversal using successor
         var current = tree.min()
         var currentKey = 0
         testNonNullAndValue(current, currentKey, currentKey * currentKey)
-
         while (true) {
             current = tree.successor(currentKey)
             currentKey++
             if (currentKey > maxKey) {
+                assertNull(current)
+                break
+            }
+
+            testNonNullAndValue(current, currentKey, currentKey * currentKey)
+        }
+
+
+        // Test end -> start traversal using predecessor
+        current = tree.max()
+        currentKey = maxKey
+        testNonNullAndValue(current, currentKey, currentKey * currentKey)
+        while (true) {
+            current = tree.predecessor(currentKey)
+            currentKey--
+            if (currentKey < minKey) {
                 assertNull(current)
                 break
             }

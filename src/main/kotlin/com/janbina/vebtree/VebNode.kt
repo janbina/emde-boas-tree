@@ -51,7 +51,12 @@ class VebNode<E> : Veb<E> {
     }
 
     override fun predecessor(key: Int): VebTree.Node<E>? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // this can succeed only if we are looking for predecessor of 1 and our min is nonnull with key 0
+        val lMin = min
+        if (key == 1 && lMin != null && lMin.key == 0) {
+            return min
+        }
+        return null
     }
 
 

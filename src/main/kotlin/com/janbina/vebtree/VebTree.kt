@@ -91,7 +91,31 @@ class VebTree<E>(private val k: Int) : Veb<E> {
     }
 
     override fun predecessor(key: Int): Node<E>? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val lMin = min
+
+        if (lMin == null || key <= lMin.key) {
+            return null
+        }
+
+        if (key > max!!.key) {
+            return max
+        }
+
+        var targetCluster = high(key)
+
+        val clusterMin = clusters[targetCluster].min()?.recomputeKey(targetCluster)
+
+        if (clusterMin != null && key > clusterMin.key) {
+            targetCluster = high(key)
+            return clusters[targetCluster].predecessor(low(key))?.recomputeKey(targetCluster)
+                    // if we did not find in target cluster, it is because we are looking for min,
+                    // which is not stored alongside other elements
+                    ?: clusterMin
+        }
+
+        targetCluster = summary.predecessor(high(key))?.key ?: return min
+
+        return clusters[targetCluster].max()?.recomputeKey(targetCluster)
     }
 
     private fun index(high: Int, low: Int) = (high shl (k / 2)) + low
