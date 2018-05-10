@@ -142,6 +142,72 @@ class Tests {
         }
     }
 
+    @Test
+    fun testDeletion() {
+        val treeSize = 8
+        val tree = VebTree<Int>(treeSize)
+
+        // Insert and delete one value, check that tree is empty
+        tree.insert(20, 20)
+        testNonNullAndValue(tree.successor(19), 20, 20)
+        tree.delete(20)
+        assertNull(tree.min())
+        assertNull(tree.max())
+        assertNull(tree.successor(19))
+
+        // Insert and delete multiple values, check that values are actually deleted and min/max updated correctly
+        for (i in 0..20) {
+            tree.insert(i, i * i)
+        }
+        for (i in 0..19) {
+            tree.delete(i)
+            testNonNullAndValue(tree.min(), i + 1, (i + 1) * (i + 1))
+            testNonNullAndValue(tree.successor(i - 1), i + 1, (i + 1) * (i + 1))
+            assertNull(tree.predecessor(i + 1))
+        }
+        testNonNullAndValue(tree.min(), 20, 20 * 20)
+        testNonNullAndValue(tree.max(), 20, 20 * 20)
+        tree.delete(20)
+        assertNull(tree.min())
+        assertNull(tree.max())
+
+        for (i in 0..20) {
+            tree.insert(i, i * i)
+        }
+        for (i in 20 downTo 1) {
+            tree.delete(i)
+            testNonNullAndValue(tree.max(), i - 1, (i - 1) * (i - 1))
+            testNonNullAndValue(tree.predecessor(i + 1), i - 1, (i - 1) * (i - 1))
+            assertNull(tree.successor(i - 1))
+        }
+        testNonNullAndValue(tree.min(), 0, 0 * 0)
+        testNonNullAndValue(tree.max(), 0, 0 * 0)
+        tree.delete(0)
+        assertNull(tree.min())
+        assertNull(tree.max())
+
+        // delete from the center of a block
+        for (i in 0..20) {
+            tree.insert(i, i * i)
+        }
+        val center = 10
+        tree.delete(center)
+        for (i in 1..9) {
+            tree.delete(center + i)
+            tree.delete(center - i)
+            testNonNullAndValue(tree.predecessor(center), (center - i - 1), (center - i - 1) * (center - i - 1))
+            testNonNullAndValue(tree.successor(center), (center + i + 1), (center + i + 1) * (center + i + 1))
+            testNonNullAndValue(tree.min(), 0, 0)
+            testNonNullAndValue(tree.max(), 20, 20 * 20)
+        }
+        tree.delete(0)
+        testNonNullAndValue(tree.min(), 20, 20 * 20)
+        testNonNullAndValue(tree.max(), 20, 20 * 20)
+        tree.delete(20)
+        assertNull(tree.min())
+        assertNull(tree.max())
+    }
+
     private fun <E> testNonNullAndValue(actual: VebTree.Node<E>?, expectedKey: Int, expectedValue: E) {
         assertNotNull(actual)
         actual!!
@@ -154,7 +220,7 @@ class Tests {
             action()
             fail("Exception should have been thrown but was not")
         } catch (e : Exception) {
-            if (e::class != expectedClass) {
+            if (expectedClass != Exception::class && e::class != expectedClass) {
                 fail("Exception class should have been $expectedClass, but was ${e::class}")
             }
         }

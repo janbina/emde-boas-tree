@@ -34,7 +34,19 @@ class VebNode<E> : Veb<E> {
     }
 
     override fun delete(key: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val lMin = min ?: return
+        val lMax = max ?: return
+
+        if (key == lMin.key) {
+            if (key == lMax.key) {
+                min = null
+                max = null
+            } else {
+                min = max
+            }
+        } else if (key == lMax.key) {
+            max = min
+        }
     }
 
     override fun min() = min

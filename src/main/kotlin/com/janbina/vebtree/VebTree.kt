@@ -64,7 +64,43 @@ class VebTree<E>(private val k: Int) : Veb<E> {
     }
 
     override fun delete(key: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val lMin = min ?: return
+
+        if (key == lMin.key) {
+            val summaryMin = summary.min()
+            if (summaryMin == null) {
+                min = null
+                max = null
+                return
+            }
+
+            val newMin = clusters[summaryMin.key].min()!!.recomputeKey(summaryMin.key)
+            min = newMin
+            deleteAfterMin(newMin.key)
+        } else {
+            deleteAfterMin(key)
+        }
+    }
+
+    private fun deleteAfterMin(key: Int) {
+        val keyHigh = high(key)
+
+        clusters[keyHigh].delete(low(key))
+
+        if (clusters[keyHigh].min() == null) {
+            summary.delete(keyHigh)
+        }
+
+        val lMax = max!!
+
+        if (key == lMax.key) {
+            val summaryMax = summary.max()
+            if (summaryMax == null) {
+                max = min
+            } else {
+                max = clusters[summaryMax.key].max()!!.recomputeKey(summaryMax.key)
+            }
+        }
     }
 
     override fun min() = min
