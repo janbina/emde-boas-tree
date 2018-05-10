@@ -54,11 +54,13 @@ class VebTree<E>(private val k: Int) : Veb<E> {
             max = x
         }
 
-        if (clusters[high(key)].min() == null) {
-            summary.insert(high(key), true)
+        val keyHigh = high(key)
+
+        if (clusters[keyHigh].min() == null) {
+            summary.insert(keyHigh, true)
         }
 
-        clusters[high(key)].insert(low(key), value)
+        clusters[keyHigh].insert(low(key), value)
     }
 
     override fun delete(key: Int) {
@@ -76,16 +78,15 @@ class VebTree<E>(private val k: Int) : Veb<E> {
             return min
         }
 
-        var targetCluster = high(key)
+        val keyHigh = high(key)
 
-        val clusterMax = clusters[targetCluster].max()?.recomputeKey(targetCluster)
+        val clusterMax = clusters[keyHigh].max()?.recomputeKey(keyHigh)
 
         if (clusterMax != null && key < clusterMax.key) {
-            targetCluster = high(key)
-            return clusters[targetCluster].successor(low(key))?.recomputeKey(targetCluster)
+            return clusters[keyHigh].successor(low(key))?.recomputeKey(keyHigh)
         }
 
-        targetCluster = summary.successor(high(key))?.key ?: return null
+        val targetCluster = summary.successor(keyHigh)?.key ?: return null
 
         return clusters[targetCluster].min()?.recomputeKey(targetCluster)
     }
@@ -101,19 +102,18 @@ class VebTree<E>(private val k: Int) : Veb<E> {
             return max
         }
 
-        var targetCluster = high(key)
+        val keyHigh = high(key)
 
-        val clusterMin = clusters[targetCluster].min()?.recomputeKey(targetCluster)
+        val clusterMin = clusters[keyHigh].min()?.recomputeKey(keyHigh)
 
         if (clusterMin != null && key > clusterMin.key) {
-            targetCluster = high(key)
-            return clusters[targetCluster].predecessor(low(key))?.recomputeKey(targetCluster)
+            return clusters[keyHigh].predecessor(low(key))?.recomputeKey(keyHigh)
                     // if we did not find in target cluster, it is because we are looking for min,
                     // which is not stored alongside other elements
                     ?: clusterMin
         }
 
-        targetCluster = summary.predecessor(high(key))?.key ?: return min
+        val targetCluster = summary.predecessor(keyHigh)?.key ?: return min
 
         return clusters[targetCluster].max()?.recomputeKey(targetCluster)
     }

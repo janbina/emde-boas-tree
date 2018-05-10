@@ -61,10 +61,4 @@ class VebNode<E> : Veb<E> {
 
 
     private fun isKeyInRange(key: Int) = (key == 0 || key == 1)
-
-    private val <A, B> Pair<A, B>.key: A
-        get() = first
-
-    private val <A, B> Pair<A, B>.value: B
-        get() = second
 }
