@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emdeboas.iml" filepath="$PROJECT_DIR$/.idea/modules/emdeboas.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emdeboas_main.iml" filepath="$PROJECT_DIR$/.idea/modules/emdeboas_main.iml" group="emdeboas" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emdeboas_test.iml" filepath="$PROJECT_DIR$/.idea/modules/emdeboas_test.iml" group="emdeboas" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emdeboastree.iml" filepath="$PROJECT_DIR$/.idea/modules/emdeboastree.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emdeboastree_main.iml" filepath="$PROJECT_DIR$/.idea/modules/emdeboastree_main.iml" group="emdeboastree" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emdeboastree_test.iml" filepath="$PROJECT_DIR$/.idea/modules/emdeboastree_test.iml" group="emdeboastree" />
     </modules>
   </component>
 </project>
