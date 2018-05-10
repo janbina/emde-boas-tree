@@ -101,6 +101,8 @@ class VebTree<E>(size: Int) : Veb<E> {
     }
 
     override fun delete(key: Int) {
+        if (!isKeyInRange(key)) return
+
         val lMin = min ?: return
 
         if (key == lMin.key) {

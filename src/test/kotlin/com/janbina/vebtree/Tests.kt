@@ -46,6 +46,10 @@ class Tests {
         // test insertion if maximal possible key
         tree.insert(treeSize - 1, 1)
         testNonNullAndValue(tree.max(), treeSize - 1, 1)
+
+        // test deleting index which is out of range
+        tree.delete(Int.MAX_VALUE)
+        tree.delete(-1000)
     }
 
     @Test
