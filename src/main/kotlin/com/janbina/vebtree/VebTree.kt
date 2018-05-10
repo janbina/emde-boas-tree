@@ -4,8 +4,10 @@ class VebTree<E>(size: Int) : Veb<E> {
 
     private val k: Int
     private val u: Int
-    private val clusters: Array<Veb<E>>
-    private val summary: Veb<Boolean>
+    private val createClusterFunc: () -> Veb<E>
+    private val createSummaryFunc: () -> Veb<Boolean>
+    private val clusters: Array<Veb<E>?>
+    private var summary: Veb<Boolean>?
 
     private var min: Node<E>? = null
     private var max: Node<E>? = null
@@ -30,11 +32,15 @@ class VebTree<E>(size: Int) : Veb<E> {
         val subtreeSize = 1 shl subtreeK
 
         if (subtreeK == 1) {
-            clusters = Array(subtreeSize, { VebNode<E>() })
-            summary = VebNode()
+            createClusterFunc = { VebNode() }
+            createSummaryFunc = { VebNode() }
+            clusters = Array(subtreeSize, { null })
+            summary = null
         } else {
-            clusters = Array(subtreeSize, { VebTree<E>(subtreeSize) })
-            summary = VebTree(subtreeSize)
+            createClusterFunc = { VebTree(subtreeSize) }
+            createSummaryFunc = { VebTree(subtreeSize) }
+            clusters = Array(subtreeSize, { null })
+            summary = null
         }
     }
 
@@ -73,25 +79,39 @@ class VebTree<E>(size: Int) : Veb<E> {
 
         val keyHigh = high(key)
 
-        if (clusters[keyHigh].min() == null) {
-            summary.insert(keyHigh, true)
+        if (clusters[keyHigh]?.min() == null) {
+            insertToSummary(keyHigh)
         }
 
-        clusters[keyHigh].insert(low(key), value)
+        insertToCluster(keyHigh, low(key), value)
+    }
+
+    private fun insertToCluster(clusterId: Int, key: Int, value: E) {
+        if (clusters[clusterId] == null) {
+            clusters[clusterId] = createClusterFunc()
+        }
+        clusters[clusterId]!!.insert(key, value)
+    }
+
+    private fun insertToSummary(key: Int) {
+        if (summary == null) {
+            summary = createSummaryFunc()
+        }
+        summary!!.insert(key, true)
     }
 
     override fun delete(key: Int) {
         val lMin = min ?: return
 
         if (key == lMin.key) {
-            val summaryMin = summary.min()
+            val summaryMin = summary?.min()
             if (summaryMin == null) {
                 min = null
                 max = null
                 return
             }
 
-            val newMin = clusters[summaryMin.key].min()!!.recomputeKey(summaryMin.key)
+            val newMin = clusters[summaryMin.key]!!.min()!!.recomputeKey(summaryMin.key)
             min = newMin
             deleteAfterMin(newMin.key)
         } else {
@@ -102,20 +122,24 @@ class VebTree<E>(size: Int) : Veb<E> {
     private fun deleteAfterMin(key: Int) {
         val keyHigh = high(key)
 
-        clusters[keyHigh].delete(low(key))
+        clusters[keyHigh]?.delete(low(key))
 
-        if (clusters[keyHigh].min() == null) {
-            summary.delete(keyHigh)
+        if (clusters[keyHigh]?.min() == null) {
+            // TODO: do we want to delete once allocated tree?
+            clusters[keyHigh] = null
+            summary?.delete(keyHigh)
         }
 
         val lMax = max!!
 
         if (key == lMax.key) {
-            val summaryMax = summary.max()
+            val summaryMax = summary?.max()
             if (summaryMax == null) {
+                // TODO: do we want to delete once allocated tree?
+                summary = null
                 max = min
             } else {
-                max = clusters[summaryMax.key].max()!!.recomputeKey(summaryMax.key)
+                max = clusters[summaryMax.key]!!.max()!!.recomputeKey(summaryMax.key)
             }
         }
     }
@@ -133,15 +157,15 @@ class VebTree<E>(size: Int) : Veb<E> {
 
         val keyHigh = high(key)
 
-        val clusterMax = clusters[keyHigh].max()?.recomputeKey(keyHigh)
+        val clusterMax = clusters[keyHigh]?.max()?.recomputeKey(keyHigh)
 
         if (clusterMax != null && key < clusterMax.key) {
-            return clusters[keyHigh].successor(low(key))?.recomputeKey(keyHigh)
+            return clusters[keyHigh]?.successor(low(key))?.recomputeKey(keyHigh)
         }
 
-        val targetCluster = summary.successor(keyHigh)?.key ?: return null
+        val targetCluster = summary?.successor(keyHigh)?.key ?: return null
 
-        return clusters[targetCluster].min()?.recomputeKey(targetCluster)
+        return clusters[targetCluster]?.min()?.recomputeKey(targetCluster)
     }
 
     override fun predecessor(key: Int): Node<E>? {
@@ -157,18 +181,18 @@ class VebTree<E>(size: Int) : Veb<E> {
 
         val keyHigh = high(key)
 
-        val clusterMin = clusters[keyHigh].min()?.recomputeKey(keyHigh)
+        val clusterMin = clusters[keyHigh]?.min()?.recomputeKey(keyHigh)
 
         if (clusterMin != null && key > clusterMin.key) {
-            return clusters[keyHigh].predecessor(low(key))?.recomputeKey(keyHigh)
+            return clusters[keyHigh]?.predecessor(low(key))?.recomputeKey(keyHigh)
                     // if we did not find in target cluster, it is because we are looking for min,
                     // which is not stored alongside other elements
                     ?: clusterMin
         }
 
-        val targetCluster = summary.predecessor(keyHigh)?.key ?: return min
+        val targetCluster = summary?.predecessor(keyHigh)?.key ?: return min
 
-        return clusters[targetCluster].max()?.recomputeKey(targetCluster)
+        return clusters[targetCluster]?.max()?.recomputeKey(targetCluster)
     }
 
     fun getSize() = u
