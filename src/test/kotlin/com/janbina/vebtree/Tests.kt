@@ -9,7 +9,7 @@ class Tests {
 
     @Test
     fun testTreeCreation() {
-        val tree = VebTree<Long>(8)
+        val tree = VebTree<Long>(256)
 
         // tree is empty
         assertNull(tree.max())
@@ -19,29 +19,38 @@ class Tests {
         assertNull(tree.successor(10))
         // finding predecessor returns null
         assertNull(tree.predecessor(10))
+
+        // requesting largest possible tree is OK
+        val tree2 = VebTree<Long>(65536)
+        tree2.insert(65535, 0)
+
+        // requesting too large tree throws
+        testException(IllegalArgumentException::class) {
+            VebTree<Long>(65536 + 1)
+        }
     }
 
     @Test
     fun testTreeBounds() {
-        val treeSize = 8
+        val treeSize = 256
         val tree = VebTree<Int>(treeSize)
 
         // test that insertion of invalid values fails
         testException(IllegalArgumentException::class) { tree.insert(-1, 0) }
-        testException(IllegalArgumentException::class) { tree.insert(1 shl treeSize, 0) }
+        testException(IllegalArgumentException::class) { tree.insert(treeSize, 0) }
 
         // test insertion of minimal possible key
         tree.insert(0, 1)
         testNonNullAndValue(tree.min(), 0, 1)
 
         // test insertion if maximal possible key
-        tree.insert((1 shl treeSize) - 1, 1)
-        testNonNullAndValue(tree.max(), (1 shl treeSize) - 1, 1)
+        tree.insert(treeSize - 1, 1)
+        testNonNullAndValue(tree.max(), treeSize - 1, 1)
     }
 
     @Test
     fun testInsertion() {
-        val tree = VebTree<Int>(8)
+        val tree = VebTree<Int>(256)
 
         tree.insert(20, 1000)
 
@@ -72,7 +81,7 @@ class Tests {
 
     @Test
     fun testSuccessor() {
-        val tree = VebTree<Int>(8)
+        val tree = VebTree<Int>(256)
 
         tree.insert(20, 1000)
 
@@ -86,7 +95,7 @@ class Tests {
 
     @Test
     fun testPredecessor() {
-        val tree = VebTree<Int>(8)
+        val tree = VebTree<Int>(256)
 
         tree.insert(20, 1000)
 
@@ -100,11 +109,11 @@ class Tests {
 
     @Test
     fun testFullTree() {
-        val treeSize = 8
+        val treeSize = 256
         val tree = VebTree<Int>(treeSize)
 
         val minKey = 0
-        val maxKey = (1 shl treeSize) - 1
+        val maxKey = treeSize - 1
 
         for (i in minKey..maxKey) {
             tree.insert(i, i * i)
@@ -144,8 +153,7 @@ class Tests {
 
     @Test
     fun testDeletion() {
-        val treeSize = 8
-        val tree = VebTree<Int>(treeSize)
+        val tree = VebTree<Int>(256)
 
         // Insert and delete one value, check that tree is empty
         tree.insert(20, 20)

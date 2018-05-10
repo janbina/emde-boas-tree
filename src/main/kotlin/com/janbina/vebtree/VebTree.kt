@@ -1,8 +1,9 @@
 package com.janbina.vebtree
 
-class VebTree<E>(private val k: Int) : Veb<E> {
+class VebTree<E>(size: Int) : Veb<E> {
 
-    private val u = 1 shl k
+    private val k: Int
+    private val u: Int
     private val clusters: Array<Veb<E>>
     private val summary: Veb<Boolean>
 
@@ -10,13 +11,29 @@ class VebTree<E>(private val k: Int) : Veb<E> {
     private var max: Node<E>? = null
 
     init {
-        val subtreeSize = k / 2
-        val subtreeCount = 1 shl subtreeSize
-        if (subtreeSize == 1) {
-            clusters = Array(subtreeCount, { VebNode<E>() })
+        // The size of the tree must be in form of 2^(2^n), so we will be able
+        // to square it all the way down to 2.
+        // We now want to check size requested by caller and pick the closest bigger value
+        // which satisfies that formula.
+        // To stay in Java's Integer, the only possible values for size are {4, 16, 256, 65536},
+        // if we will use Long for keys, there would be one extra (4294967296).
+        k = when {
+            size <= 4 -> 2
+            size <= 16 -> 4
+            size <= 256 -> 8
+            size <= 65536 -> 16
+            else -> throw IllegalArgumentException("Size of the tree must not be greater than 65536")
+        }
+
+        u = 1 shl k
+        val subtreeK = k / 2
+        val subtreeSize = 1 shl subtreeK
+
+        if (subtreeK == 1) {
+            clusters = Array(subtreeSize, { VebNode<E>() })
             summary = VebNode()
         } else {
-            clusters = Array(subtreeCount, { VebTree<E>(subtreeSize) })
+            clusters = Array(subtreeSize, { VebTree<E>(subtreeSize) })
             summary = VebTree(subtreeSize)
         }
     }
@@ -153,6 +170,10 @@ class VebTree<E>(private val k: Int) : Veb<E> {
 
         return clusters[targetCluster].max()?.recomputeKey(targetCluster)
     }
+
+    fun getSize() = u
+
+    fun getMaxKey() = u - 1
 
     private fun index(high: Int, low: Int) = (high shl (k / 2)) + low
 
