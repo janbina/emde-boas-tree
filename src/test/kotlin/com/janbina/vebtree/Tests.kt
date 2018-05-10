@@ -36,8 +36,8 @@ class Tests {
         val tree = VebTree<Int>(treeSize)
 
         // test that insertion of invalid values fails
-        testException(IllegalArgumentException::class) { tree.insert(-1, 0) }
-        testException(IllegalArgumentException::class) { tree.insert(treeSize, 0) }
+        testException(IndexOutOfBoundsException::class) { tree.insert(-1, 0) }
+        testException(IndexOutOfBoundsException::class) { tree.insert(treeSize, 0) }
 
         // test insertion of minimal possible key
         tree.insert(0, 1)

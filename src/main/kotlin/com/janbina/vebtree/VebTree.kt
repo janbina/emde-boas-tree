@@ -46,7 +46,7 @@ class VebTree<E>(size: Int) : Veb<E> {
 
     override fun insert(key: Int, value: E) {
         if (!isKeyInRange(key)) {
-            throw IllegalArgumentException()
+            throw IndexOutOfBoundsException()
         }
 
         val lMin = min
